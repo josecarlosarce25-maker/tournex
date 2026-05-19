@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─────────────────────────────────────────────────────────────
+   Tournex design system — premium dark.
+   Brand DNA: near-black surfaces, lime accent, real depth.
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Surfaces — an elevation ladder from page → card → hover → raised */
+  --color-bg: #0a0a0a;
+  --color-bg2: #111111;
+  --color-bg3: #161616;
+  --color-bg4: #1c1c1c;
+
+  /* Borders */
+  --color-br: #1e1e1e;
+  --color-br2: #2a2a2a;
+  --color-hair: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --color-tx: #f4f4f4;
+  --color-tx2: #a8a8a8;
+  --color-tx3: #6f6f6f;
+
+  /* Accent + status */
+  --color-lime: #adff2f;
+  --color-lime2: #c4ff6b;
+  --color-limedim: #7bbf1f;
+  --color-red: #ff4d4d;
+  --color-green: #2ed573;
+  --color-orange: #ff9f43;
+  --color-blue: #4da6ff;
+
+  /* Type */
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* Radii */
+  --radius-soft: 10px;
+  --radius-card: 14px;
+  --radius-xl: 20px;
+
+  /* Elevation — soft, layered shadows for real depth */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 24px -4px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 0 1px rgba(173, 255, 47, 0.18),
+    0 8px 36px -6px rgba(173, 255, 47, 0.28);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Base ──────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  /* faint lime aurora at the top — premium ambient depth */
+  background-image: radial-gradient(
+    ellipse 70% 45% at 50% -10%,
+    rgba(173, 255, 47, 0.07),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--color-tx);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv05", "ss01";
+}
+
+::selection {
+  background: rgba(173, 255, 47, 0.25);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-br2);
+  border-radius: 99px;
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tabular numbers everywhere monospace is used (scores, stats) */
+.font-mono {
+  font-feature-settings: "tnum";
+}
+
+/* ── Reusable surface treatments ───────────────────────────── */
+
+/* A card with a subtle top-lit gradient + hairline border + depth */
+.surface {
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025),
+    rgba(255, 255, 255, 0)
+  );
+  background-color: var(--color-bg2);
+  border: 1px solid var(--color-hair);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-hover {
+  transition:
+    transform 0.25s var(--ease-out),
+    border-color 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out);
+}
+.surface-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(173, 255, 47, 0.35);
+  box-shadow: var(--shadow-md);
+}
+
+/* Lime glow used on primary actions / active elements */
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Gradient text for hero accents */
+.text-gradient-lime {
+  background: linear-gradient(135deg, #d6ff8f, var(--color-lime));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Status pills ──────────────────────────────────────────── */
+
+.status-draft {
+  background: rgba(255, 159, 67, 0.12);
+  color: var(--color-orange);
+  box-shadow: inset 0 0 0 1px rgba(255, 159, 67, 0.2);
+}
+.status-open {
+  background: rgba(46, 213, 115, 0.12);
+  color: var(--color-green);
+  box-shadow: inset 0 0 0 1px rgba(46, 213, 115, 0.2);
+}
+.status-live {
+  background: rgba(255, 77, 77, 0.12);
+  color: var(--color-red);
+  box-shadow: inset 0 0 0 1px rgba(255, 77, 77, 0.25);
+  animation: pulse 2s ease-in-out infinite;
+}
+.status-done {
+  background: rgba(77, 166, 255, 0.12);
+  color: var(--color-blue);
+  box-shadow: inset 0 0 0 1px rgba(77, 166, 255, 0.2);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Entrance animation for content */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s var(--ease-out) both;
 }
