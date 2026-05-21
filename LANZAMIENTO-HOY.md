@@ -1,61 +1,62 @@
-# Tournex — Lo que falta para lanzar
+# Tournex — Lo que falta para lanzar (Cloudflare)
 
-> Todo lo anterior ya está hecho. Este doc tiene SOLO los pasos pendientes.
-> Tiempo total: ~45 min (puedes hacerlo mañana tranquilo).
+> Este doc tiene SOLO los pasos pendientes. Todo lo demás ya está hecho.
+> Tiempo total estimado: ~40 min.
+
+---
+
+## ✅ Lo que ya quedó listo (yo)
+
+- ✅ Supabase configurado (Google OAuth activo, tabla `subscriptions` creada)
+- ✅ Código en GitHub: https://github.com/josecarlosarce25-maker/tournex
+- ✅ **30 días gratis** en Pro y Club integrado en Stripe Checkout
+- ✅ Adaptador de Cloudflare Workers configurado (`@opennextjs/cloudflare`)
+- ✅ Build verificado: `npm run cf:build` pasa limpio
 
 ---
 
 ## PROYECTO: Tournex
-- **Código en GitHub:** https://github.com/josecarlosarce25-maker/tournex
-- **Base de datos:** Supabase proyecto `mhohuwpaikqevwqqpihc`
-- **Google login:** ✅ ya activo
+- **Carpeta:** `~/tournex`
+- **Repo:** https://github.com/josecarlosarce25-maker/tournex
+- **Supabase:** proyecto `mhohuwpaikqevwqqpihc`
 
 ---
 
-## PASO 1 — Stripe `~30 min`
+## PASO 1 — Stripe `~30 min · primero`
 
-> Trabajamos en **modo prueba** hoy (sin RFC ni verificación). Cuando Stripe
-> te apruebe en 1-3 días, cambias 6 variables y listo.
+> Modo prueba hoy (tarjetas falsas). Cuando Stripe te apruebe en 1-3 días, cambias las 6 vars y queda en producción real.
 
 ### 1.1 Crear cuenta
-1. Ve a **https://stripe.com/mx** → click **Start now**
-2. Escribe tu email y crea contraseña → **Create account**
-3. Verifica tu correo (te llega un link)
-4. Llena el formulario de bienvenida (puedes poner datos básicos, no necesitas RFC todavía)
-5. Cuando entres al dashboard, asegúrate que el switch de arriba a la derecha diga **"Test mode"** — si no, actívalo
+1. Ve a **https://stripe.com/mx** → **Start now**
+2. Email + contraseña → verifica correo
+3. Llena el formulario básico (puedes saltarte RFC por ahora)
+4. Arriba a la derecha del dashboard, asegúrate que diga **"Test mode"** (en naranja)
 
-### 1.2 Crear los 4 productos
-Ve a menú izquierdo → **Product catalog** → botón **+ Add product**
+### 1.2 Crear los productos
+Menú izquierdo → **Product catalog** → **+ Add product**
 
-**Producto 1:**
+**Tournex Pro:**
 - Name: `Tournex Pro`
-- Activa **"Recurring"** (no one-time)
-- Amount: `99` · Currency: **MXN** · Period: **Monthly**
-- Click **Save product**
-- Ahora agrega el precio anual al mismo producto: click **+ Add another price** → `950` MXN · Yearly → Save
+- Activa **"Recurring"**
+- Amount: `99` · MXN · **Monthly** → Save product
+- En el mismo producto, click **+ Add another price** → `950` MXN · **Yearly** → Save
 
-**Producto 2:**
+**Tournex Club:**
 - Name: `Tournex Club`
-- Recurring, `249` MXN, Monthly → Save
-- **+ Add another price** → `2388` MXN, Yearly → Save
+- Recurring · `249` MXN · Monthly → Save
+- **+ Add another price** → `2388` MXN · Yearly → Save
+
+> No actives "Free trial" aquí — el trial de 30 días ya está en el código y se aplica automáticamente.
 
 ### 1.3 Copiar los 4 Price IDs
-Para cada precio, haz click en el producto → click en el precio → arriba verás algo como `price_1ABCxxx`.
-
-Anótalos:
-```
-Pro mensual:  price_________
-Pro anual:    price_________
-Club mensual: price_________
-Club anual:   price_________
-```
+Para cada precio: click en el producto → click en el precio → arriba aparece `price_xxxxx`. Copia los 4.
 
 ### 1.4 Copiar las API keys
-Menú izquierdo → **Developers** → **API keys**
-- **Publishable key:** `pk_test_...` — click para copiar
-- **Secret key:** click **"Reveal test key"** → copia el `sk_test_...`
+Menú izquierdo → **Developers → API keys**
+- **Publishable key:** `pk_test_...`
+- **Secret key:** click "Reveal test key" → copia `sk_test_...`
 
-### 📨 Mándame en el chat:
+### 📨 Mándame:
 ```
 STRIPE PUBLISHABLE KEY: pk_test_...
 STRIPE SECRET KEY: sk_test_...
@@ -65,97 +66,104 @@ CLUB MENSUAL: price_...
 CLUB ANUAL: price_...
 ```
 
-**Yo te respondo con el bloque exacto de env vars listo para pegar en Netlify.**
+Yo armo el bloque de env vars listo para pegar en Cloudflare.
 
 ---
 
-## PASO 2 — Netlify `~10 min` (después de que yo te confirme las vars)
+## PASO 2 — Cloudflare Pages `~10 min · después de Stripe`
 
-> No importa que hayas borrado el proyecto anterior. El código está en GitHub
-> y se reimporta en 2 clics.
+> **No es Netlify.** Es Cloudflare Workers + Pages (totalmente gratis sin créditos limitados).
 
-### 2.1 Crear cuenta nueva (o entrar a la existente)
-1. Ve a **https://app.netlify.com/signup**
-2. Click **"Sign up with GitHub"** → autoriza con la misma cuenta `josecarlosarce25-maker`
-3. Si ya tenías cuenta, solo entra en **https://app.netlify.com**
+### 2.1 Crear cuenta
+1. Ve a **https://dash.cloudflare.com/sign-up**
+2. Email + contraseña → verifica correo
+3. **No te pide tarjeta**. El plan Free incluye todo lo que necesitamos.
 
-### 2.2 Crear el sitio
-1. Click **"Add new site"** → **"Import an existing project"**
-2. Click **GitHub** → autoriza si te lo pide → busca y selecciona el repo **`tournex`**
-3. Netlify detecta la config automáticamente. Solo verifica que diga:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-4. **NO le des Deploy todavía** — primero hay que agregar las variables de entorno
+### 2.2 Crear el Worker
+1. En el dashboard, menú izquierdo → **Workers & Pages**
+2. Click **Create** (botón azul arriba)
+3. Click la pestaña **"Workers"** → **"Import a repository"**
+4. Click **"Connect GitHub"** → autoriza Cloudflare a ver tus repos
+5. Selecciona el repo **`tournex`**
 
-### 2.3 Agregar variables de entorno
-Click en **"Add environment variables"** (está en la misma pantalla antes del deploy)
+### 2.3 Configurar el build
+Cloudflare te pregunta cómo construir el Worker. Llena exactamente esto:
 
-Agrega estas 3 que ya tenemos (yo te doy los valores completos cuando me escribas):
+| Campo | Valor |
+|---|---|
+| **Worker name** | `tournex` |
+| **Production branch** | `main` |
+| **Build command** | `npx opennextjs-cloudflare build` |
+| **Deploy command** | `npx wrangler deploy` |
+| **Build output directory** | (déjalo vacío) |
+| **Root directory** | `/` |
+
+### 2.4 Variables de entorno
+**ANTES de darle Deploy**, click **"Add variable"** en la sección de variables de build/runtime. Agrega estas 10 (yo te paso los valores en el chat después del Paso 1):
+
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
-```
-
-Y las 7 de Stripe que yo te mando en el Paso 1:
-```
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET          ← pon cualquier texto por ahora, ej: "pendiente"
+STRIPE_WEBHOOK_SECRET          ← pon "pendiente" por ahora
 NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY
 NEXT_PUBLIC_STRIPE_PRICE_PRO_ANNUAL
 NEXT_PUBLIC_STRIPE_PRICE_CLUB_MONTHLY
 NEXT_PUBLIC_STRIPE_PRICE_CLUB_ANNUAL
 ```
 
-### 2.4 Deploy
-5. Click **"Deploy tournex"**
-6. Espera ~3 minutos (la primera vez tarda más)
-7. Cuando diga **"Published"**, tienes una URL tipo `https://algo-abc123.netlify.app`
-8. Puedes cambiar el nombre: **Site configuration → Change site name** → escribe `tournex-app` → Save
-   - La URL queda como `https://tournex-app.netlify.app`
+> **Importante:** las que empiezan con `STRIPE_SECRET_KEY` y `SUPABASE_SERVICE_ROLE_KEY` márcalas como **"Encrypt"** (checkbox al lado del campo) — son secretas.
+
+### 2.5 Deploy
+Click **"Save and deploy"**.
+
+Espera ~4 minutos (la primera vez instala dependencias y compila). Vas a ver logs en vivo.
+
+Cuando termine te da una URL tipo `https://tournex.tu-cuenta.workers.dev`.
 
 ### 📨 Mándame:
 ```
-NETLIFY URL: https://______.netlify.app
+CLOUDFLARE URL: https://tournex.________.workers.dev
 ```
 
 ---
 
-## PASO 3 — Configurar las URLs `~5 min` (después de que tengas la URL de Netlify)
+## PASO 3 — Configurar URLs `~5 min`
 
-> Reemplaza `tournex-app.netlify.app` con tu URL real en todo lo que sigue.
+> Reemplaza `tournex.tu-cuenta.workers.dev` por tu URL real en todos los pasos.
 
-### 3A — Supabase (2 min)
+### 3A — Supabase
 1. Ve a **https://supabase.com/dashboard/project/mhohuwpaikqevwqqpihc/auth/url-configuration**
-2. **Site URL** → escribe: `https://tournex-app.netlify.app`
-3. **Redirect URLs** → click **+ Add URL** → escribe: `https://tournex-app.netlify.app/auth/callback`
-4. Click **Save**
+2. **Site URL:** `https://tournex.tu-cuenta.workers.dev`
+3. **Redirect URLs** → **+ Add URL:** `https://tournex.tu-cuenta.workers.dev/auth/callback`
+4. **Save**
 
-### 3B — Google Cloud (1 min)
-1. Ve a **https://console.cloud.google.com** → menú → **APIs & Services → Credentials**
-2. Click en tu OAuth 2.0 Client ID (el que se llama "Tournex web")
-3. En **Authorized JavaScript origins** → click **+ ADD URI** → escribe: `https://tournex-app.netlify.app`
-4. Click **Save**
+### 3B — Google Cloud
+1. **https://console.cloud.google.com** → **APIs & Services → Credentials**
+2. Click tu OAuth 2.0 Client ID ("Tournex web")
+3. **Authorized JavaScript origins** → **+ ADD URI:** `https://tournex.tu-cuenta.workers.dev`
+4. **Save**
 
-### 3C — Stripe webhook (2 min)
-1. Ve a **https://dashboard.stripe.com/test/webhooks** → click **+ Add endpoint**
-2. **Endpoint URL:** `https://tournex-app.netlify.app/api/webhooks/stripe`
-3. Click **"Select events"** → marca estos 6:
+### 3C — Stripe webhook
+1. **https://dashboard.stripe.com/test/webhooks** → **+ Add endpoint**
+2. **Endpoint URL:** `https://tournex.tu-cuenta.workers.dev/api/webhooks/stripe`
+3. **Select events** — marca estos 6:
    - `checkout.session.completed`
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
    - `invoice.payment_succeeded`
    - `invoice.payment_failed`
-4. Click **Add endpoint**
-5. En la pantalla del webhook recién creado, click **"Reveal"** junto a **Signing secret** → copia el `whsec_...`
+4. **Add endpoint** → copia el **Signing secret** (`whsec_...`)
 
-### 3D — Actualizar webhook secret en Netlify (1 min)
-1. Netlify → tu sitio → **Site configuration → Environment variables**
-2. Busca `STRIPE_WEBHOOK_SECRET` → click **Edit** → pega el `whsec_...` → **Save**
-3. Ve a **Deploys** → click **"Trigger deploy"** → **"Deploy site"**
-4. Espera ~2 min a que termine
+### 3D — Actualizar webhook secret en Cloudflare
+1. Cloudflare dashboard → Workers & Pages → click en **tournex**
+2. Tab **Settings** → **Variables and Secrets**
+3. Busca `STRIPE_WEBHOOK_SECRET` → click **Edit** → pega el `whsec_...` → **Encrypt** ✓ → Save
+4. Tab **Deployments** → click los 3 puntos del último deploy → **Retry deployment**
+5. Espera ~2 min
 
 ### 📨 Mándame:
 ```
@@ -166,33 +174,51 @@ TODO CONFIGURADO ✓
 
 ## PASO 4 — Prueba final (juntos, ~10 min)
 
-Cuando me digas "todo configurado" te guío en vivo:
+Cuando confirmes "todo configurado":
 
 1. **Login con Google** — entra a tu URL pública, click "Continuar con Google"
-2. **Crear torneo** — wizard completo, 4 parejas, brackets, marcador
-3. **Suscripción de prueba:**
-   - Landing → "Probar Pro"
-   - En Stripe Checkout usa: tarjeta **`4242 4242 4242 4242`** · cualquier fecha futura · CVC `123`
-   - Debe volver con plan Pro activo
+2. **Crear torneo** — wizard, 4 parejas, brackets, capturar marcador
+3. **Prueba el trial de 30 días:**
+   - Landing → **"Empezar prueba gratis"** (botón verde del plan Pro)
+   - En Stripe Checkout debe decir **"30 days free"** arriba del precio
+   - Tarjeta de prueba: `4242 4242 4242 4242` · fecha futura · CVC `123`
+   - Confirma → vuelves a Tournex con plan Pro activo y estado **"trialing"**
+   - Stripe NO cobra hasta el día 31
 
-**Cuando funcione: Tournex está vivo. 🎉**
+**Si todo funciona: 🎉 Tournex está vivo y con trial de 30 días.**
 
 ---
 
-## Referencia rápida de links
+## Referencia rápida
 
-| Qué | Link |
+| Servicio | Link |
 |---|---|
 | GitHub | https://github.com/josecarlosarce25-maker/tournex |
 | Supabase | https://supabase.com/dashboard/project/mhohuwpaikqevwqqpihc |
 | Google Cloud | https://console.cloud.google.com |
 | Stripe | https://dashboard.stripe.com |
-| Netlify | https://app.netlify.com |
+| **Cloudflare** | **https://dash.cloudflare.com** |
+
+---
+
+## Notas técnicas (por si algo falla)
+
+### Si el build de Cloudflare falla
+- Revisa que en "Build command" diga exactamente: `npx opennextjs-cloudflare build`
+- Revisa que en "Deploy command" diga: `npx wrangler deploy`
+- El proyecto debe tener `wrangler.jsonc` en la raíz (ya lo subí)
+
+### Si el login con Google da error después de deployar
+Probablemente falta agregar la URL de Cloudflare en Google Cloud (Paso 3B). Revisa que esté `https://tournex.________.workers.dev` en "Authorized JavaScript origins".
+
+### Si los pagos no aparecen en la base de datos
+1. El webhook está configurado pero no llega → verifica en Stripe Dashboard → Webhooks → ver intentos
+2. El secret no coincide → re-copia el `whsec_...` y pégalo en Cloudflare con Encrypt ✓
 
 ---
 
 ## Después del lanzamiento
 
-- **Stripe aprobación real (1-3 días):** te llega email → activa Live mode → cambia las 6 vars de Stripe en Netlify a `pk_live_...` / `sk_live_...` → redeploy
-- **Dominio propio** (`tournex.app`): ~$15/año, lo conecto en 10 min cuando quieras
-- **IA assistant:** construirlo con Claude API, ~2-3 días, incluido en Pro/Club
+- **Stripe modo Live (1-3 días):** llega email → activas Live mode → repites los 4 productos en Live → cambias las 6 vars de Stripe en Cloudflare a `pk_live_...` / `sk_live_...`
+- **Dominio propio** (`tournex.app` o lo que escojas): ~$15 USD/año en Cloudflare Registrar. Ya con Cloudflare Workers, conectarlo es 1 click (Custom Domain) y el SSL es automático
+- **IA assistant:** Claude API + tool use, 2-3 días de desarrollo
