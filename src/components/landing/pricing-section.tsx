@@ -45,7 +45,7 @@ const PLANS: Plan[] = [
       "Liga semanal",
       "Asistente IA · Preventa incluida",
     ],
-    cta: "Probar Pro",
+    cta: "Empezar prueba gratis",
     highlight: true,
   },
   {
@@ -61,7 +61,7 @@ const PLANS: Plan[] = [
       "Soporte prioritario",
       "Asistente IA · Preventa incluida",
     ],
-    cta: "Suscribirme al Club",
+    cta: "Empezar prueba gratis",
     highlight: false,
   },
 ];
@@ -121,6 +121,12 @@ export function PricingSection() {
       <p className="mt-3 text-center text-tx2">
         Empieza gratis. Sube de plan cuando tu torneo crezca.
       </p>
+
+      {/* Free-trial banner */}
+      <div className="mx-auto mt-5 flex w-fit items-center gap-2 rounded-full border border-lime/30 bg-lime/10 px-4 py-1.5 text-xs font-semibold text-lime">
+        <span className="font-mono text-[10px] tracking-widest">✦</span>
+        30 días gratis en Pro y Club · cancela cuando quieras
+      </div>
 
       {/* Billing toggle */}
       <div className="mt-8 flex items-center justify-center">
@@ -199,6 +205,11 @@ export function PricingSection() {
               {!isFree && billing === "monthly" && p.annual > 0 && (
                 <p className="mt-1 text-[11px] text-tx3">
                   o ${formatPrice(Math.round(p.annual / 12))} /mes pagando anual
+                </p>
+              )}
+              {!isFree && (
+                <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-lime/10 px-2 py-0.5 text-[10px] font-semibold text-lime ring-1 ring-inset ring-lime/25">
+                  ✦ 30 días gratis · sin compromiso
                 </p>
               )}
 

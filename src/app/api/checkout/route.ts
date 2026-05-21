@@ -55,12 +55,17 @@ export async function POST(request: NextRequest) {
       billing,
     },
     subscription_data: {
+      // 30-day free trial for every new subscriber. Stripe automatically
+      // charges on day 31 unless the user cancels first.
+      trial_period_days: 30,
       metadata: {
         organizer_id: user.id,
         plan,
         billing,
       },
     },
+    // Card collected up front so the trial-to-paid conversion is automatic.
+    payment_method_collection: "always",
     allow_promotion_codes: true,
     success_url: `${origin}/dashboard?subscription=success`,
     cancel_url: `${origin}/dashboard?subscription=cancel`,
