@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { Button, Input, Field } from "@/components/ui/primitives";
 import { toast } from "@/components/ui/toast";
@@ -12,6 +12,7 @@ type Stage = "form" | "magic-sent" | "reset-sent" | "signup-needs-confirm";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("signin");
   const [stage, setStage] = useState<Stage>("form");
   const [name, setName] = useState("");
@@ -19,6 +20,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // If we got bounced here from /auth/callback with an error, surface it.
+  useEffect(() => {
+    const err = searchParams.get("error");
+    if (err === "callback") {
+      toast(
+        "El link de confirmación expiró o ya se usó. Vuelve a entrar.",
+        "error",
+      );
+    }
+  }, [searchParams]);
 
   // If already signed in, skip straight to the dashboard.
   useEffect(() => {

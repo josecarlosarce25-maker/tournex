@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build artifacts (Cloudflare adapter, wrangler, deployment outputs).
+    ".open-next/**",
+    ".wrangler/**",
+    ".deploy/**",
+    ".vercel/**",
+    // Generated database types (hand-maintained, but very long).
+    "src/lib/database.types.ts",
   ]),
 ]);
 

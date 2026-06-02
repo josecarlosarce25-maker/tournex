@@ -40,6 +40,10 @@ yarn-error.log*
 .open-next/
 .wrangler/
 
+# deployment artifacts (contain secrets)
+.deploy/
+.env.deploy
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

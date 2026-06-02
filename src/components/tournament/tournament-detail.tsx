@@ -39,7 +39,7 @@ export function TournamentDetail({ id }: { id: string }) {
     setBusy(true);
     try {
       await fn();
-    } catch (e) {
+    } catch {
       toast(`Error en ${label}`, "error");
     } finally {
       setBusy(false);

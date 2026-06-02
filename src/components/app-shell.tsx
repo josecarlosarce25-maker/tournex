@@ -20,8 +20,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
-  // Close the mobile drawer on navigation.
+  // Close the mobile drawer on navigation. The lint rule flags setState in
+  // an effect as a smell — here it's a legitimate UI sync to URL state.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarOpen(false);
   }, [pathname]);
 

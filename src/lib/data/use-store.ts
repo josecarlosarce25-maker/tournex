@@ -25,7 +25,11 @@ function useLiveData<T>(
   const [loading, setLoading] = useState(true);
   const mounted = useRef(true);
   const fetcherRef = useRef(fetcher);
-  fetcherRef.current = fetcher;
+
+  // Keep ref pointing at the latest fetcher without mutating during render.
+  useEffect(() => {
+    fetcherRef.current = fetcher;
+  });
 
   const reload = useCallback(() => {
     fetcherRef.current().then((d) => {
@@ -35,8 +39,9 @@ function useLiveData<T>(
 
   useEffect(() => {
     mounted.current = true;
-    setLoading(true);
-    fetcher().then((d) => {
+    // Loading is already true from the initial useState(true). We only need
+    // to flip it to false once the first fetch resolves.
+    fetcherRef.current().then((d) => {
       if (!mounted.current) return;
       setData(d);
       setLoading(false);

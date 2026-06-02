@@ -9,7 +9,6 @@ import { store } from "@/lib/data/use-store";
 import type { Tournament, Match } from "@/lib/types";
 import { isPlaceholder } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/utils";
-import { formatScoreLine } from "@/lib/tournament/scoring";
 
 interface MatchEntry {
   match: Match;

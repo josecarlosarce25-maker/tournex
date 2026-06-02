@@ -106,7 +106,7 @@ export function PricingSection() {
         setLoadingPlan(null);
         return;
       }
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch {
       toast("Error de conexión", "error");
       setLoadingPlan(null);
