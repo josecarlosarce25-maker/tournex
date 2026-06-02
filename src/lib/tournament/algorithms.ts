@@ -65,13 +65,36 @@ export function roundRobin(teams: Team[]): Round[] {
 /**
  * Single-elimination bracket. Pads to the next power of two with BYEs;
  * BYE matches are auto-resolved so the real team advances.
+ *
+ * BYEs are *spread* across the bracket so we never create a BYE-vs-BYE
+ * match (those were being left as `tbd()` slots that never resolved —
+ * a real bug for 5- and 6-team brackets).
  */
 export function elimination(teams: Team[]): Round[] {
   let size = 1;
   while (size < teams.length) size *= 2;
 
-  const seeded: (Team | Placeholder)[] = [...teams];
-  while (seeded.length < size) seeded.push(bye());
+  const numByes = size - teams.length;
+  const seeded: (Team | Placeholder)[] = [];
+
+  if (numByes === 0) {
+    // Power-of-two team count → no BYEs needed.
+    seeded.push(...teams);
+  } else {
+    // Distribute: first (teams - numByes) real teams play each other
+    // (paired off), then the remaining real teams each face a BYE.
+    // This guarantees no BYE-vs-BYE.
+    const numRealMatches = (teams.length - numByes) / 2;
+    for (let i = 0; i < numRealMatches; i++) {
+      seeded.push(teams[i * 2]);
+      seeded.push(teams[i * 2 + 1]);
+    }
+    const remaining = teams.slice(numRealMatches * 2);
+    for (const t of remaining) {
+      seeded.push(t);
+      seeded.push(bye());
+    }
+  }
 
   const rounds: Round[] = [];
   let current: (Team | Placeholder)[] = seeded;

@@ -37,7 +37,7 @@ export default function DashboardPage() {
           body: JSON.stringify({ plan, billing }),
         });
         const data = await r.json();
-        if (r.ok && data.url) window.location.href = data.url;
+        if (r.ok && data.url) window.location.assign(data.url);
       })();
     } catch {
       // ignore malformed pending checkout
