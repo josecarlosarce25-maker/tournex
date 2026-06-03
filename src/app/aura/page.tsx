@@ -69,6 +69,14 @@ const CAMPANA = [
   },
 ];
 
+// Videos de la campaña (YouTube Shorts).
+const VIDEOS = [
+  { id: "_NofD0W4WJk", titulo: "Combo", pie: "El combo AURA." },
+  { id: "zDVvUvQBJaE", titulo: "Promoción", pie: "La promo de lanzamiento." },
+  { id: "ivpZrfqB8rA", titulo: "Lanzamiento", pie: "Así despierta AURA." },
+  { id: "i3zb2AfTF3c", titulo: "Descuento", pie: "Aprovecha el descuento." },
+];
+
 /* ── Página ──────────────────────────────────────────────────── */
 
 export default function AuraPage() {
@@ -84,6 +92,9 @@ export default function AuraPage() {
             </a>
             <a href="#campana" className="transition-colors hover:text-white">
               Campaña
+            </a>
+            <a href="#videos" className="transition-colors hover:text-white">
+              Videos
             </a>
             <a href="#lanzamiento" className="transition-colors hover:text-white">
               Lanzamiento
@@ -258,6 +269,52 @@ export default function AuraPage() {
               </figure>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Videos — YouTube Shorts de la campaña */}
+      <section id="videos" className="mx-auto max-w-6xl px-6 py-24">
+        <div className="text-center">
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#5fe6cd]">
+            En movimiento
+          </span>
+          <h2 className="mx-auto mt-4 max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
+            Mira AURA en acción
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#9fb3ad]">
+            Combo, promoción, lanzamiento y descuento — toda la campaña en
+            video.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {VIDEOS.map((v) => (
+            <figure
+              key={v.id}
+              className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#081915] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]"
+            >
+              <div className="relative aspect-[9/16] w-full bg-black">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${v.id}?rel=0&playsinline=1`}
+                  title={`AURA — ${v.titulo}`}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+              <figcaption className="flex items-center justify-between gap-3 px-5 py-4">
+                <div>
+                  <p className="text-sm font-bold text-white">{v.titulo}</p>
+                  <p className="text-xs text-[#9fb3ad]">{v.pie}</p>
+                </div>
+                <span className="inline-flex rounded-full border border-[#3fe0c4]/25 bg-[#3fe0c4]/[0.07] px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#5fe6cd]">
+                  Short
+                </span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 

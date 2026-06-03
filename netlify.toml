@@ -1,0 +1,22 @@
+# Configuración de Netlify para el sitio AURA (Next.js).
+# Solo conecta este repo/rama en Netlify — el runtime de Next.js se instala solo.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# El plugin oficial de Next.js. Netlify lo instala automáticamente.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Valores de marcador de posición para que el build pase sin configurar nada.
+# (El sitio AURA es estático y no los usa.) Si algún día quieres habilitar las
+# funciones de Tournex, reemplázalos por tus credenciales reales en
+# Site configuration → Environment variables.
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_PUBLIC_SUPABASE_URL = "https://placeholder.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "placeholder-anon-key"
+  SUPABASE_SERVICE_ROLE_KEY = "placeholder-service-key"
+  STRIPE_SECRET_KEY = "sk_test_placeholder"
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_placeholder"
