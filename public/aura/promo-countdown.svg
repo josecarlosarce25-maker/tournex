@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" font-family="'DM Sans','Segoe UI',sans-serif">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6a821"/>
+      <stop offset="0.45" stop-color="#d9920e"/>
+      <stop offset="1" stop-color="#7d5206"/>
+    </linearGradient>
+    <linearGradient id="num" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7cf86"/>
+      <stop offset="1" stop-color="#8a6c2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#gold)"/>
+  <text x="48" y="120" font-size="58" font-weight="800" fill="#1a1205">FALTAN</text>
+  <text x="40" y="330" font-size="240" font-weight="900" fill="url(#num)">5</text>
+  <text x="48" y="430" font-size="76" font-weight="900" fill="#1a1205">DÍAS</text>
+  <text x="48" y="490" font-size="40" font-weight="800" fill="#1a1205">PARA TU</text>
+  <text x="48" y="540" font-size="40" font-weight="800" fill="#1a1205">DESPERTAR</text>
+  <!-- Bottle -->
+  <g transform="translate(420,90)">
+    <rect x="40" y="0" width="40" height="34" rx="8" fill="#0a0a0a"/>
+    <path d="M30 40 Q60 60 90 40 L98 140 Q120 320 60 470 Q0 320 22 140 Z" fill="#0c0c0c" stroke="#2a2a2a" stroke-width="1.5"/>
+    <text x="60" y="250" font-size="26" font-weight="800" fill="#c9a84c" text-anchor="middle">A</text>
+    <text x="60" y="290" font-size="15" letter-spacing="3" fill="#c9a84c" text-anchor="middle">AURA</text>
+    <text x="60" y="400" font-size="13" letter-spacing="3" fill="#8a7a4a" text-anchor="middle">AURA</text>
+  </g>
+  <text x="300" y="650" font-size="32" font-weight="800" fill="#1a1205" text-anchor="middle">TU AURA, TU ENERGÍA, TU AGUA</text>
+  <g stroke="#1a1205" stroke-width="3" fill="none">
+    <circle cx="150" cy="730" r="26"/><path d="M150 714v16l10 8"/>
+    <rect x="270" y="712" width="44" height="32" rx="4" fill="#1a1205"/><rect x="316" y="722" width="5" height="12" fill="#1a1205"/>
+    <circle cx="445" cy="710" r="8" fill="#1a1205" stroke="none"/><path d="M425 745c0-14 9-22 20-22s20 8 20 22" fill="#1a1205" stroke="none"/>
+    <path d="M510 718l8 14-8 14-8-14z" fill="#1a1205" stroke="none"/>
+  </g>
+</svg>

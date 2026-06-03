@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" font-family="'DM Sans','Segoe UI',sans-serif">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f3ea"/>
+      <stop offset="1" stop-color="#e9e1d2"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#paper)"/>
+  <text x="300" y="80" font-size="46" font-weight="800" fill="#15110a" text-anchor="middle">TU MOMENTO, TU AURA</text>
+
+  <!-- 4 benefit tiles -->
+  <g>
+    <rect x="40" y="120" width="230" height="150" rx="14" fill="#ffffff" stroke="#dcd3c2"/>
+    <text x="155" y="205" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">EQUILIBRIO</text>
+    <text x="155" y="232" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">DIARIO</text>
+
+    <rect x="330" y="120" width="230" height="150" rx="14" fill="#ffffff" stroke="#dcd3c2"/>
+    <text x="445" y="205" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">CONCENTRACIÓN</text>
+    <text x="445" y="232" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">CLARA</text>
+
+    <rect x="40" y="300" width="230" height="150" rx="14" fill="#ffffff" stroke="#dcd3c2"/>
+    <text x="155" y="385" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">CONCENTRACIÓN</text>
+    <text x="155" y="412" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">CLARA</text>
+
+    <rect x="330" y="300" width="230" height="150" rx="14" fill="#ffffff" stroke="#dcd3c2"/>
+    <text x="445" y="385" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">RENDIMIENTO</text>
+    <text x="445" y="412" font-size="20" font-weight="800" fill="#15110a" text-anchor="middle">NATURAL</text>
+  </g>
+
+  <!-- Bottle center -->
+  <g transform="translate(240,150)">
+    <rect x="40" y="0" width="40" height="30" rx="8" fill="#0a0a0a"/>
+    <path d="M30 36 Q60 54 90 36 L96 130 Q116 290 60 420 Q4 290 24 130 Z" fill="#0d0d0d" stroke="#333" stroke-width="1.5"/>
+    <circle cx="60" cy="220" r="30" fill="#2a2a2a"/>
+    <text x="60" y="226" font-size="13" letter-spacing="2" fill="#c9a84c" text-anchor="middle">AURA</text>
+    <text x="60" y="360" font-size="13" letter-spacing="3" fill="#8a7a4a" text-anchor="middle">AURA</text>
+  </g>
+
+  <text x="300" y="640" font-size="30" font-weight="800" fill="#15110a" text-anchor="middle">Y TÚ, ¿CÓMO DESPIERTAS TU AURA?</text>
+  <rect x="60" y="690" width="480" height="56" rx="10" fill="#efe6d3"/>
+  <text x="300" y="727" font-size="28" font-weight="800" fill="#15110a" text-anchor="middle">MÁS AGUA, MÁS VIDA, MÁS AURA ✦</text>
+</svg>

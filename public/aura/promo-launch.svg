@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" font-family="'DM Sans','Segoe UI',sans-serif">
+  <defs>
+    <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dee0"/>
+      <stop offset="0.55" stop-color="#aab6ba"/>
+      <stop offset="1" stop-color="#8a999d"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e7cf86"/>
+      <stop offset="1" stop-color="#8a6c2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#mist)"/>
+  <!-- mountains -->
+  <path d="M0 800 L0 420 L160 540 L300 380 L440 540 L600 400 L600 800 Z" fill="#9aa7ab" opacity="0.5"/>
+  <path d="M0 800 L0 560 L180 660 L340 540 L500 660 L600 600 L600 800 Z" fill="#b6c0c3" opacity="0.5"/>
+
+  <!-- AURA eye mark -->
+  <g transform="translate(300,90)">
+    <path d="M0 -36 L26 28 H14 L0 -6 L-14 28 H-26 Z" fill="#1c1c1c"/>
+    <path d="M-13 -2 C-6 -10 6 -10 13 -2 C6 6 -6 6 -13 -2 Z" fill="#d7dee0"/>
+    <circle cx="0" cy="-2" r="4.5" fill="#1c1c1c"/>
+  </g>
+  <text x="300" y="200" font-size="64" font-weight="400" letter-spacing="14" fill="#1c1c1c" text-anchor="middle">AURA</text>
+
+  <text x="300" y="290" font-size="40" font-weight="800" fill="#1c1c1c" text-anchor="middle">REVELANDO EL</text>
+  <text x="300" y="338" font-size="40" font-weight="800" fill="#1c1c1c" text-anchor="middle">PODER DEL AGUA</text>
+
+  <text x="300" y="470" font-size="56" font-weight="900" font-style="italic" fill="#ffffff" stroke="#1c1c1c" stroke-width="2" text-anchor="middle">LANZAMIENTO</text>
+  <text x="300" y="540" font-size="56" font-weight="900" font-style="italic" fill="#ffffff" stroke="#1c1c1c" stroke-width="2" text-anchor="middle">MUY PRONTO</text>
+
+  <!-- icons -->
+  <g stroke="#1c1c1c" stroke-width="3" fill="none">
+    <path d="M150 680c14 16 22 26 22 36a22 22 0 0 1-44 0c0-10 8-20 22-36z"/>
+    <path d="M300 690c10 12 16 20 16 27a16 16 0 0 1-32 0c0-7 6-15 16-27z"/>
+    <path d="M420 716l30-46 26 38 10-14 30 22z"/>
+  </g>
+  <text x="150" y="775" font-size="22" font-weight="700" fill="#1c1c1c" text-anchor="middle">PURA</text>
+  <text x="305" y="775" font-size="22" font-weight="700" fill="#1c1c1c" text-anchor="middle">EQUILIBRADA</text>
+  <text x="470" y="775" font-size="22" font-weight="700" fill="#1c1c1c" text-anchor="middle">ESENCIAL</text>
+</svg>
