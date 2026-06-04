@@ -1,138 +1,92 @@
-# 🚀 Tournex — Deploy en 5 minutos
+# 🎉 Tournex está LIVE
 
-> Esta es la versión **express**: tú creas 2 cuentas (15 min), me das 3 llaves, yo corro 1 comando.
->
-> Tiempo total: **~20 min** (era 45+ antes).
-
----
-
-## ✅ Lo que YA está hecho
-
-- Código completo, builds limpios, sin errores de TypeScript ni de lint
-- Auto-deploy script en `scripts/deploy.sh` que hace todo:
-  - Crea los 4 productos en Stripe
-  - Sube el Worker a Cloudflare
-  - Configura las 10 variables de entorno
-  - Crea el webhook de Stripe
-  - Configura las URLs de Supabase
-- 30 días de prueba gratis integrados en checkout
-- PWA manifest, OG image, error pages, sitemap
-- Todo pusheado a GitHub
+## 🌐 URL pública
+# https://tournex.josecarlosarce25.workers.dev
 
 ---
 
-## 🎯 Lo único que tú tienes que hacer
+## ✅ Todo lo que quedó funcionando
 
-### Paso A — Crear cuenta de Stripe (~7 min)
-
-1. **https://stripe.com/mx** → **Start now**
-2. Email + contraseña → verifica correo
-3. Llena lo básico (México, business name: Tournex, software/SaaS)
-4. Arriba a la derecha confirma que dice **"Test mode"** (naranja)
-5. Menú izquierdo → **Developers → API keys**
-6. Copia **Publishable key** (`pk_test_...`) y **Secret key** (`sk_test_...`)
-
-### Paso B — Crear cuenta de Cloudflare (~5 min)
-
-1. **https://dash.cloudflare.com/sign-up**
-2. Email + contraseña → verifica correo
-3. Skip cualquier "Add a website" o elige plan **Free**
-4. Click tu email arriba a la derecha → **Profile**
-5. Tab **API Tokens** → **Create Token**
-6. Busca template **"Edit Cloudflare Workers"** → **Use template**
-7. Deja todo default → **Continue to summary** → **Create Token**
-8. **Copia el token completo**. ⚠️ Solo se ve una vez.
-
-### Paso C — Mandarme los 3 valores
-
-Pégamelos así:
-
-```
-STRIPE PUBLISHABLE: pk_test_...
-STRIPE SECRET: sk_test_...
-CLOUDFLARE TOKEN: ...
-```
-
----
-
-## 🤖 Lo que YO hago cuando me mandes las llaves
-
-1. Lleno `.env.deploy` con tus llaves + las de Supabase que ya tengo
-2. Corro `./scripts/deploy.sh`
-3. El script en automático:
-   - Crea Tournex Pro + Tournex Club con 4 precios (99/950/249/2388 MXN)
-   - Compila la app para Cloudflare Workers
-   - La sube
-   - Crea el webhook de Stripe
-   - Configura Site URL en Supabase
-   - Te imprime la URL pública
-
-Después solo te falta **un paso manual** (la API de Google Cloud OAuth no permite automatizar este específicamente):
-
-### Paso D — Agregar URL a Google Cloud (~30 segundos)
-
-1. **https://console.cloud.google.com/apis/credentials**
-2. Click el OAuth client "Tournex web"
-3. **Authorized JavaScript origins** → **+ ADD URI** → pega la URL que te di
-4. **Save**
-
-### Paso E — Probar (~5 min juntos)
-
-1. Abrir la URL pública
-2. Login con Google
-3. Crear un torneo de prueba
-4. Click "Empezar prueba gratis" → tarjeta `4242 4242 4242 4242` · futura · `123`
-5. Confirmar que cae el plan Pro con estado "trialing"
-
-🎉 **Tournex vivo en internet.**
-
----
-
-## 📁 Archivos clave del proyecto
-
-| Archivo | Para qué |
+| Componente | Estado |
 |---|---|
-| `scripts/deploy.sh` | El comando único que despliega todo |
-| `scripts/setup-stripe.mjs` | Crea los 4 productos en Stripe vía API |
-| `scripts/setup-stripe-webhook.mjs` | Crea el webhook después del deploy |
-| `scripts/configure-supabase.mjs` | Configura Site URL en Supabase |
-| `.env.deploy.example` | Template de las 4 llaves necesarias |
-| `wrangler.jsonc` | Config de Cloudflare Workers |
-| `open-next.config.ts` | Adaptador de Next.js → Cloudflare |
+| **App desplegada** | ✅ Cloudflare Workers |
+| **Base de datos** | ✅ Supabase activo, todas las tablas intactas |
+| **Login con Google** | ✅ Configurado y verificado |
+| **Login email/contraseña** | ✅ Funcionando |
+| **Stripe — 4 productos** | ✅ Pro ($99/$950) + Club ($249/$2388) |
+| **30 días de prueba gratis** | ✅ Integrado en el checkout |
+| **Webhook de Stripe** | ✅ Conectado y con secret |
+| **Site URL + redirects** | ✅ Apuntando a la URL de Cloudflare |
+
+**8/8 smoke tests pasan.** La app responde, conecta con Supabase, y el checkout valida sesión.
 
 ---
 
-## 🔄 Si algo falla en el deploy
+## ⚠️ IMPORTANTE — Léeme
 
-El script se detiene en el primer error. Para volver a empezar desde donde falló:
+### 1. Victory Pádel está pausado
+Para reactivar Tournex tuve que pausar **Victory Padel Shop** en Supabase
+(el plan free solo permite 2 proyectos activos y tenías 3: CulDeSac, Victory, Tournex).
+
+**Para reactivar Victory Pádel cuando lo necesites:**
+- Tienes que pausar otro proyecto (CulDeSac o Tournex), O
+- Subir a Supabase Pro ($25 USD/mes) que permite proyectos ilimitados activos
+
+> Mientras Victory Pádel esté pausado, su tienda no carga datos. Avísame y lo reactivo.
+
+### 2. Supabase free se pausa tras 7 días sin tráfico
+Si Tournex no recibe visitas en 7 días, Supabase lo vuelve a pausar.
+Con usuarios reales esto no pasa. Si lo dejas sin tráfico, avísame y lo reactivo en 2 min.
+
+### 3. Estás en modo prueba de Stripe
+Los pagos son con tarjetas falsas (`4242 4242 4242 4242`). Cuando Stripe te
+apruebe los cobros reales (1-3 días), cambiamos a modo Live en 5 min.
+
+---
+
+## 🧪 Pruébalo tú ahora (5 min)
+
+1. Abre **https://tournex.josecarlosarce25.workers.dev**
+2. Click **"Continuar con Google"** → entra con tu cuenta
+3. Crea un torneo de prueba (Nuevo Torneo → wizard)
+4. Inscribe parejas, genera brackets, captura un marcador
+5. Para probar el cobro:
+   - Sal a la landing → click **"Empezar prueba gratis"** (plan Pro)
+   - En Stripe Checkout verás **"30 days free"**
+   - Tarjeta: `4242 4242 4242 4242` · cualquier fecha futura · CVC `123`
+   - Confirma → vuelves con plan Pro activo (estado "trialing")
+   - **No te cobran** hasta el día 31
+
+Si algo no jala, dime exactamente qué pantalla y qué pasó.
+
+---
+
+## 📦 Datos técnicos del deploy
+
+| Recurso | Valor |
+|---|---|
+| Worker | `tournex` en Cloudflare |
+| URL | https://tournex.josecarlosarce25.workers.dev |
+| GitHub | https://github.com/josecarlosarce25-maker/tournex |
+| Supabase | proyecto `mhohuwpaikqevwqqpihc` (us-west-1) |
+| Stripe productos | Tournex Pro (`prod_UdxuLB6tR2EmzU`), Tournex Club (`prod_UdxuJQmrf53mbW`) |
+| Stripe webhook | `we_1TefzWAEwkUvPYjnizzhHCLu` |
+
+---
+
+## 🔮 Próximos pasos (cuando quieras)
+
+1. **Dominio propio** (`tournex.app` o el que elijas) — ~$10 USD/año, lo conecto a Cloudflare en 5 min, SSL automático
+2. **Stripe modo Live** — cuando te aprueben, cambiamos 6 valores y los cobros son reales
+3. **Resolver el límite de Supabase** — decidir si subes a Pro ($25/mes) para tener Tournex + Victory + CulDeSac los 3 activos, o si rotas cuál mantener prendido
+4. **IA assistant** — el que anunciamos en la landing, ~2-3 días de desarrollo
+
+---
+
+## 🔁 Si necesitas re-deployar (yo)
 
 ```bash
-# Re-corre todo (es idempotente — no duplica productos)
-./scripts/deploy.sh
+cd ~/tournex
+./scripts/deploy.sh          # idempotente, no duplica nada
+./scripts/verify-deploy.sh https://tournex.josecarlosarce25.workers.dev
 ```
-
-Outputs intermedios se guardan en `.deploy/`:
-- `.deploy/stripe-prices.json` — los 4 Price IDs
-- `.deploy/stripe-webhook.json` — webhook id + signing secret
-- `.deploy/build.log` — log del primer build
-- `.deploy/redeploy.log` — log del redeploy con webhook secret
-
----
-
-## 📚 Links útiles
-
-| Servicio | Dashboard |
-|---|---|
-| GitHub | https://github.com/josecarlosarce25-maker/tournex |
-| Supabase | https://supabase.com/dashboard/project/mhohuwpaikqevwqqpihc |
-| Stripe | https://dashboard.stripe.com |
-| Cloudflare | https://dash.cloudflare.com |
-| Google Cloud | https://console.cloud.google.com |
-
----
-
-## 🛠 Después del lanzamiento
-
-- **Stripe modo Live (1-3 días):** activa Live, edita `.env.deploy` con `pk_live_...` y `sk_live_...`, vuelve a correr `./scripts/deploy.sh` (es idempotente y actualiza todo).
-- **Dominio propio:** en Cloudflare Workers → tu Worker → Settings → Triggers → Custom Domains → agrega `tournex.app`. SSL automático.
-- **IA assistant:** Claude API + tool use, ~2-3 días de implementación.
