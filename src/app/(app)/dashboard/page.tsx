@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/primitives";
 import { useUser, useTournaments, useContacts } from "@/lib/data/use-store";
 import { toast } from "@/components/ui/toast";
+import { BillingCard } from "@/components/billing-card";
 import { FORMAT_LABELS, STATUS_LABELS, isPadel } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -91,28 +92,8 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Próximamente: asistente IA */}
-      <div className="surface relative mb-7 overflow-hidden rounded-card p-5 sm:p-6">
-        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-lime/15 blur-3xl" />
-        <div className="relative flex flex-wrap items-center gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-soft bg-lime/10 text-2xl ring-1 ring-inset ring-lime/25">
-            🤖
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-base font-bold">Asistente con IA</h3>
-              <span className="rounded-full bg-lime/15 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-lime ring-1 ring-inset ring-lime/30">
-                PRONTO
-              </span>
-            </div>
-            <p className="mt-1 text-[13px] leading-relaxed text-tx2">
-              Habla con Tournex en español: <em>“mueve a Pérez a 2da”</em>,{" "}
-              <em>“anota 6-4”</em>, <em>“¿quién va líder?”</em> — la IA ejecuta
-              los cambios. <span className="text-lime">Incluido gratis para ti</span> como suscriptor temprano.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Suscripción: upgrade (free) o gestionar (suscrito) */}
+      <BillingCard user={user} />
 
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-base font-bold">Mis Torneos</h2>

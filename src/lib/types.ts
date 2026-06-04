@@ -156,4 +156,8 @@ export interface Organizer {
   name: string;
   email: string;
   phone?: string;
+  /** 'free' | 'pro' | 'club' — mirror of the active subscription. */
+  subscriptionPlan?: string;
+  /** 'free' | 'trialing' | 'active' | 'past_due' | 'canceled' | … */
+  subscriptionStatus?: string;
 }

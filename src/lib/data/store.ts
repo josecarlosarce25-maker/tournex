@@ -148,6 +148,11 @@ export async function getUser(): Promise<Organizer | null> {
       name: org.name,
       email: org.email,
       phone: org.phone ?? undefined,
+      subscriptionPlan:
+        (org as { subscription_plan?: string }).subscription_plan ?? "free",
+      subscriptionStatus:
+        (org as { subscription_status?: string }).subscription_status ??
+        "free",
     };
   }
   // Trigger hasn't fired yet — fall back to auth user.
@@ -158,6 +163,8 @@ export async function getUser(): Promise<Organizer | null> {
       user.email?.split("@")[0] ??
       "Organizador",
     email: user.email ?? "",
+    subscriptionPlan: "free",
+    subscriptionStatus: "free",
   };
 }
 
