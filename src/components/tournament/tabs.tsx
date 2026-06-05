@@ -13,6 +13,8 @@ import {
   ProgressBar,
   EmptyState,
   CopyField,
+  Modal,
+  ConfirmDialog,
 } from "@/components/ui/primitives";
 import { toast } from "@/components/ui/toast";
 import { ScoreInput } from "./score-input";
@@ -55,6 +57,10 @@ export function TeamsTab({ t }: { t: Tournament }) {
     : 0;
 
   const [registering, setRegistering] = useState(false);
+  // Edit + delete modals.
+  const [editing, setEditing] = useState<Team | null>(null);
+  const [deleting, setDeleting] = useState<Team | null>(null);
+
   async function register() {
     setRegistering(true);
     const result = await store.addTeam(t.id, form);
@@ -247,15 +253,22 @@ export function TeamsTab({ t }: { t: Tournament }) {
                     </Td>
                   )}
                   <Td className="text-right">
-                    <button
-                      onClick={async () => {
-                        await store.removeTeam(t.id, tm.id);
-                        toast("Eliminada");
-                      }}
-                      className="rounded px-2 py-1 text-tx3 hover:bg-red/10 hover:text-red"
-                    >
-                      ✕
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => setEditing(tm)}
+                        aria-label="Editar"
+                        className="rounded px-2 py-1 text-tx3 transition-colors hover:bg-bg3 hover:text-tx"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => setDeleting(tm)}
+                        aria-label="Eliminar"
+                        className="rounded px-2 py-1 text-tx3 transition-colors hover:bg-red/10 hover:text-red"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </Td>
                 </tr>
               ))}
@@ -263,7 +276,160 @@ export function TeamsTab({ t }: { t: Tournament }) {
           </table>
         </Card>
       )}
+
+      {/* Edit team modal — keyed so it re-initializes per team, no effect. */}
+      {editing && (
+        <EditTeamModal
+          key={editing.id}
+          team={editing}
+          tournamentId={t.id}
+          categories={t.categories}
+          includesShirt={t.includesShirt}
+          onClose={() => setEditing(null)}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={deleting !== null}
+        onClose={() => setDeleting(null)}
+        onConfirm={async () => {
+          if (!deleting) return;
+          await store.removeTeam(t.id, deleting.id);
+          toast("Eliminada");
+        }}
+        title={`¿Eliminar ${word}?`}
+        body={`Se quitará "${deleting?.name ?? ""}" del torneo. Esta acción no se puede deshacer.`}
+        confirmLabel="Sí, eliminar"
+      />
     </div>
+  );
+}
+
+/** Modal form to edit a registered team's data. Mounted with a `key` per
+ *  team, so the initial state below hydrates correctly without an effect. */
+function EditTeamModal({
+  team,
+  tournamentId,
+  categories,
+  includesShirt,
+  onClose,
+}: {
+  team: Team;
+  tournamentId: string;
+  categories: string[];
+  includesShirt?: boolean;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState({
+    player1Name: team.player1Name ?? "",
+    player1Phone: team.player1Phone ?? "",
+    player2Name: team.player2Name ?? "",
+    player2Phone: team.player2Phone ?? "",
+    category: team.category ?? categories[0] ?? "General",
+    player1ShirtSize: team.player1ShirtSize ?? "",
+    player2ShirtSize: team.player2ShirtSize ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const setF = (p: Partial<typeof form>) =>
+    setForm((prev) => ({ ...prev, ...p }));
+
+  async function save() {
+    if (!form.player1Name.trim()) {
+      toast("El jugador 1 no puede quedar vacío", "error");
+      return;
+    }
+    setSaving(true);
+    const r = await store.updateTeam(tournamentId, team.id, form);
+    setSaving(false);
+    if (!r.ok) {
+      toast(r.error ?? "No se pudo guardar", "error");
+      return;
+    }
+    toast("Cambios guardados ✓");
+    onClose();
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Editar pareja">
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <Field label="Jugador 1">
+          <Input
+            value={form.player1Name}
+            onChange={(e) => setF({ player1Name: e.target.value })}
+            placeholder="Nombre completo"
+          />
+        </Field>
+        <Field label="WhatsApp J1">
+          <Input
+            value={form.player1Phone}
+            onChange={(e) => setF({ player1Phone: e.target.value })}
+            placeholder="33 1234 5678"
+          />
+        </Field>
+        <Field label="Jugador 2">
+          <Input
+            value={form.player2Name}
+            onChange={(e) => setF({ player2Name: e.target.value })}
+            placeholder="Nombre completo"
+          />
+        </Field>
+        <Field label="WhatsApp J2">
+          <Input
+            value={form.player2Phone}
+            onChange={(e) => setF({ player2Phone: e.target.value })}
+            placeholder="33 1234 5678"
+          />
+        </Field>
+        <Field label="Categoría">
+          <Select
+            value={form.category}
+            onChange={(e) => setF({ category: e.target.value })}
+          >
+            {categories.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </Select>
+        </Field>
+        {includesShirt && (
+          <>
+            <Field label="Talla J1">
+              <Select
+                value={form.player1ShirtSize}
+                onChange={(e) => setF({ player1ShirtSize: e.target.value })}
+              >
+                {SHIRT_SIZES.map((s) => (
+                  <option key={s} value={s}>
+                    {s || "—"}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Talla J2">
+              <Select
+                value={form.player2ShirtSize}
+                onChange={(e) => setF({ player2ShirtSize: e.target.value })}
+              >
+                {SHIRT_SIZES.map((s) => (
+                  <option key={s} value={s}>
+                    {s || "—"}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </>
+        )}
+      </div>
+      <div className="mt-6 flex justify-end gap-2.5">
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button size="sm" onClick={save} disabled={saving}>
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </Button>
+      </div>
+    </Modal>
   );
 }
 

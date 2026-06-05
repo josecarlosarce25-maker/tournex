@@ -401,6 +401,38 @@ export async function setStatus(id: string, status: TournamentStatus) {
   await updateTournament(id, { status });
 }
 
+/** Edits the basic info of a tournament (name, venue, date, entry fee,
+ *  pair cap, payment link). Only provided fields are touched. */
+export async function updateTournamentInfo(
+  id: string,
+  info: {
+    name?: string;
+    location?: string;
+    date?: string;
+    price?: number | null;
+    maxPairs?: number | null;
+    payLink?: string | null;
+  },
+): Promise<{ ok: boolean; error?: string }> {
+  if (info.name !== undefined && !info.name.trim()) {
+    return { ok: false, error: "El nombre no puede quedar vacío." };
+  }
+  const patch: Database["public"]["Tables"]["tournaments"]["Update"] = {};
+  if (info.name !== undefined) patch.name = info.name.trim();
+  if (info.location !== undefined) patch.location = info.location || null;
+  if (info.date !== undefined) patch.date = info.date || null;
+  if (info.price !== undefined) patch.price = info.price ?? null;
+  if (info.maxPairs !== undefined) patch.max_pairs = info.maxPairs ?? null;
+  if (info.payLink !== undefined) patch.pay_link = info.payLink || null;
+
+  const { error } = await supabase
+    .from("tournaments")
+    .update(patch)
+    .eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export async function deleteTournament(id: string) {
   await supabase.from("tournaments").delete().eq("id", id);
 }
@@ -524,6 +556,59 @@ export async function updateTeamStatus(
   status: Team["status"],
 ) {
   await supabase.from("teams").update({ status }).eq("id", teamId);
+}
+
+/** Edits a registered team's names/phones/emails/category. Re-derives the
+ *  formatted pair name. Returns ok:false with a message on validation error. */
+export async function updateTeam(
+  _tournamentId: string,
+  teamId: string,
+  input: Partial<NewTeamInput>,
+): Promise<{ ok: boolean; error?: string }> {
+  if (input.player1Name !== undefined && !input.player1Name.trim()) {
+    return { ok: false, error: "El jugador 1 no puede quedar vacío." };
+  }
+
+  const patch: Database["public"]["Tables"]["teams"]["Update"] = {};
+  if (input.player1Name !== undefined)
+    patch.player1_name = input.player1Name.trim();
+  if (input.player1Phone !== undefined)
+    patch.player1_phone = input.player1Phone || null;
+  if (input.player1Email !== undefined)
+    patch.player1_email = input.player1Email || null;
+  if (input.player1ShirtSize !== undefined)
+    patch.player1_shirt_size = input.player1ShirtSize || null;
+  if (input.player2Name !== undefined)
+    patch.player2_name = input.player2Name?.trim() || null;
+  if (input.player2Phone !== undefined)
+    patch.player2_phone = input.player2Phone || null;
+  if (input.player2Email !== undefined)
+    patch.player2_email = input.player2Email || null;
+  if (input.player2ShirtSize !== undefined)
+    patch.player2_shirt_size = input.player2ShirtSize || null;
+  if (input.category !== undefined) patch.category = input.category || "General";
+
+  // If either name changed, refresh the display name.
+  if (input.player1Name !== undefined || input.player2Name !== undefined) {
+    const { data: existing } = await supabase
+      .from("teams")
+      .select("player1_name, player2_name")
+      .eq("id", teamId)
+      .maybeSingle();
+    const p1 = input.player1Name?.trim() ?? existing?.player1_name ?? "";
+    const p2 =
+      input.player2Name !== undefined
+        ? input.player2Name?.trim()
+        : (existing?.player2_name ?? undefined);
+    patch.name = formatPairName(p1, p2 || undefined);
+  }
+
+  const { error } = await supabase
+    .from("teams")
+    .update(patch)
+    .eq("id", teamId);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }
 
 export async function removeTeam(_tournamentId: string, teamId: string) {

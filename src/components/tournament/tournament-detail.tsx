@@ -3,10 +3,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, StatusBadge } from "@/components/ui/primitives";
+import {
+  Button,
+  StatusBadge,
+  Modal,
+  ConfirmDialog,
+  Field,
+  Input,
+} from "@/components/ui/primitives";
 import { toast } from "@/components/ui/toast";
 import { useTournament, store } from "@/lib/data/use-store";
 import { FORMAT_LABELS, STATUS_LABELS, isPadel } from "@/lib/utils";
+import type { Tournament } from "@/lib/types";
 import {
   TeamsTab,
   BracketsTab,
@@ -16,6 +24,7 @@ import {
   PlayerTab,
   ShareTab,
 } from "./tabs";
+import { AssistantChat } from "./assistant-chat";
 
 type TabId =
   | "teams"
@@ -33,6 +42,8 @@ export function TournamentDetail({ id }: { id: string }) {
   // True while any header action (Generar, Iniciar, Terminar, Eliminar) is
   // in flight — disables the buttons to prevent double-clicks.
   const [busy, setBusy] = useState(false);
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function withBusy<T>(label: string, fn: () => Promise<T>) {
     if (busy) return;
@@ -114,6 +125,13 @@ export function TournamentDetail({ id }: { id: string }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditingInfo(true)}
+            >
+              ✏️ Editar
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setTab("share")}>
               🔗 Compartir
             </Button>
@@ -155,21 +173,37 @@ export function TournamentDetail({ id }: { id: string }) {
               variant="danger"
               size="sm"
               disabled={busy}
-              onClick={() => {
-                if (confirm(`¿Eliminar "${t.name}"? No se puede deshacer.`)) {
-                  void withBusy("eliminar", async () => {
-                    await store.deleteTournament(t.id);
-                    toast("Torneo eliminado");
-                    router.push("/dashboard");
-                  });
-                }
-              }}
+              onClick={() => setConfirmDelete(true)}
             >
               🗑️
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Edit tournament info modal */}
+      {editingInfo && (
+        <EditTournamentModal
+          tournament={t}
+          onClose={() => setEditingInfo(false)}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() =>
+          withBusy("eliminar", async () => {
+            await store.deleteTournament(t.id);
+            toast("Torneo eliminado");
+            router.push("/dashboard");
+          })
+        }
+        title="¿Eliminar torneo?"
+        body={`Se borrará "${t.name}" con todas sus parejas y resultados. Esta acción no se puede deshacer.`}
+        confirmLabel="Sí, eliminar"
+      />
 
       {/* Tabs */}
       <div className="mb-6 flex gap-0 overflow-x-auto border-b border-hair">
@@ -198,6 +232,117 @@ export function TournamentDetail({ id }: { id: string }) {
         {activeTab === "player" && <PlayerTab t={t} />}
         {activeTab === "share" && <ShareTab t={t} />}
       </div>
+
+      {/* Floating AI assistant */}
+      <AssistantChat tournament={t} />
     </div>
+  );
+}
+
+/** Modal to edit a tournament's basic info. Keyed by id from the parent so
+ *  initial state hydrates without an effect. */
+function EditTournamentModal({
+  tournament,
+  onClose,
+}: {
+  tournament: Tournament;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState({
+    name: tournament.name,
+    location: tournament.location ?? "",
+    date: tournament.date ?? "",
+    price: tournament.price != null ? String(tournament.price) : "",
+    maxPairs: tournament.maxPairs != null ? String(tournament.maxPairs) : "",
+    payLink: tournament.payLink ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+  const setF = (p: Partial<typeof form>) =>
+    setForm((prev) => ({ ...prev, ...p }));
+
+  async function save() {
+    if (!form.name.trim()) {
+      toast("El nombre no puede quedar vacío", "error");
+      return;
+    }
+    setSaving(true);
+    const r = await store.updateTournamentInfo(tournament.id, {
+      name: form.name,
+      location: form.location,
+      date: form.date,
+      price: form.price ? Number(form.price) : null,
+      maxPairs: form.maxPairs ? Number(form.maxPairs) : null,
+      payLink: form.payLink,
+    });
+    setSaving(false);
+    if (!r.ok) {
+      toast(r.error ?? "No se pudo guardar", "error");
+      return;
+    }
+    toast("Torneo actualizado ✓");
+    onClose();
+  }
+
+  return (
+    <Modal open onClose={onClose} title="Editar torneo">
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <Field label="Nombre del torneo">
+            <Input
+              value={form.name}
+              onChange={(e) => setF({ name: e.target.value })}
+              placeholder="Copa Primavera 2026"
+            />
+          </Field>
+        </div>
+        <Field label="Sede / lugar">
+          <Input
+            value={form.location}
+            onChange={(e) => setF({ location: e.target.value })}
+            placeholder="Club Deportivo…"
+          />
+        </Field>
+        <Field label="Fecha">
+          <Input
+            value={form.date}
+            onChange={(e) => setF({ date: e.target.value })}
+            placeholder="15 de junio"
+          />
+        </Field>
+        <Field label="Costo de inscripción (MXN)">
+          <Input
+            type="number"
+            value={form.price}
+            onChange={(e) => setF({ price: e.target.value })}
+            placeholder="500"
+          />
+        </Field>
+        <Field label="Cupo máximo de parejas">
+          <Input
+            type="number"
+            value={form.maxPairs}
+            onChange={(e) => setF({ maxPairs: e.target.value })}
+            placeholder="16"
+          />
+        </Field>
+        <div className="sm:col-span-2">
+          <Field label="Link de pago (MercadoPago / transferencia)">
+            <Input
+              value={form.payLink}
+              onChange={(e) => setF({ payLink: e.target.value })}
+              placeholder="https://mpago.la/…"
+            />
+          </Field>
+        </div>
+      </div>
+      <div className="mt-6 flex justify-end gap-2.5">
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button size="sm" onClick={save} disabled={saving}>
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </Button>
+      </div>
+    </Modal>
   );
 }

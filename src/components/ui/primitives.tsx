@@ -2,7 +2,12 @@
 // All styled with the design tokens + surface treatments in globals.css.
 "use client";
 
-import { useState, type ReactNode, type InputHTMLAttributes } from "react";
+import {
+  useState,
+  useEffect,
+  type ReactNode,
+  type InputHTMLAttributes,
+} from "react";
 
 // ── Button ───────────────────────────────────────────────────
 
@@ -417,5 +422,101 @@ export function CopyField({ value }: { value: string }) {
         {copied ? "✓ Copiado" : "Copiar"}
       </Button>
     </div>
+  );
+}
+
+// ── Modal ────────────────────────────────────────────────────
+
+/** Centered modal dialog with a dark backdrop. Closes on Escape or backdrop
+ *  click. Pass a title and any children (usually a form). */
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  maxWidth = "max-w-lg",
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  maxWidth?: string;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div
+        className={`surface glow relative z-10 w-full ${maxWidth} animate-fade-up rounded-card p-6`}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="text-lg font-bold">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="rounded-soft px-2 py-1 text-tx3 transition-colors hover:bg-bg3 hover:text-tx"
+          >
+            ✕
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Confirmation dialog for destructive actions. */
+export function ConfirmDialog({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  body,
+  confirmLabel = "Eliminar",
+  danger = true,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  body: string;
+  confirmLabel?: string;
+  danger?: boolean;
+}) {
+  return (
+    <Modal open={open} onClose={onClose} title={title} maxWidth="max-w-sm">
+      <p className="text-sm text-tx2">{body}</p>
+      <div className="mt-6 flex justify-end gap-2.5">
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button
+          variant={danger ? "danger" : "lime"}
+          size="sm"
+          onClick={() => {
+            onConfirm();
+            onClose();
+          }}
+        >
+          {confirmLabel}
+        </Button>
+      </div>
+    </Modal>
   );
 }
