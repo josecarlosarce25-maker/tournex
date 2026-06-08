@@ -67,10 +67,16 @@ export default function LandingPage() {
       <header className="sticky top-0 z-20 border-b border-hair bg-bg/70 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Wordmark />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Link
+              href="/ranking"
+              className="rounded-soft px-3 py-2 text-sm font-semibold text-tx2 transition-colors hover:text-tx sm:px-4"
+            >
+              🏆 Ranking
+            </Link>
             <Link
               href="/login"
-              className="rounded-soft px-4 py-2 text-sm font-semibold text-tx2 transition-colors hover:text-tx"
+              className="hidden rounded-soft px-4 py-2 text-sm font-semibold text-tx2 transition-colors hover:text-tx sm:block"
             >
               Entrar
             </Link>

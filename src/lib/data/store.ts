@@ -22,6 +22,9 @@ import type {
   Jornada,
   SetScore,
   Match,
+  Player,
+  PlayerMatch,
+  FriendGroup,
 } from "@/lib/types";
 import { isPlaceholder } from "@/lib/types";
 import { slugify, formatPairName } from "@/lib/utils";
@@ -412,6 +415,8 @@ export async function updateTournamentInfo(
     price?: number | null;
     maxPairs?: number | null;
     payLink?: string | null;
+    state?: string | null;
+    municipality?: string | null;
   },
 ): Promise<{ ok: boolean; error?: string }> {
   if (info.name !== undefined && !info.name.trim()) {
@@ -424,6 +429,9 @@ export async function updateTournamentInfo(
   if (info.price !== undefined) patch.price = info.price ?? null;
   if (info.maxPairs !== undefined) patch.max_pairs = info.maxPairs ?? null;
   if (info.payLink !== undefined) patch.pay_link = info.payLink || null;
+  if (info.state !== undefined) patch.state = info.state || null;
+  if (info.municipality !== undefined)
+    patch.municipality = info.municipality || null;
 
   const { error } = await supabase
     .from("tournaments")
@@ -812,4 +820,177 @@ export async function listContacts(): Promise<Contact[]> {
     .select("*")
     .order("created_at", { ascending: false });
   return (data ?? []).map(contactFromRow);
+}
+
+// ── Ranking ──────────────────────────────────────────────────
+
+function playerFromRow(r: Database["public"]["Tables"]["players"]["Row"]): Player {
+  return {
+    id: r.id,
+    displayName: r.display_name,
+    phone: r.phone ?? undefined,
+    state: r.state ?? undefined,
+    municipality: r.municipality ?? undefined,
+    rating: Math.round(r.rating),
+    peakRating: Math.round(r.peak_rating),
+    matchesPlayed: r.matches_played,
+    wins: r.wins,
+    losses: r.losses,
+    currentStreak: r.current_streak,
+  };
+}
+
+export interface RankingFilter {
+  state?: string;
+  municipality?: string;
+  search?: string;
+  limit?: number;
+}
+
+/** Global leaderboard, ordered by rating. Optional geo + name filters. */
+export async function listRanking(filter: RankingFilter = {}): Promise<Player[]> {
+  let q = supabase
+    .from("players")
+    .select("*")
+    .gt("matches_played", 0)
+    .order("rating", { ascending: false })
+    .limit(filter.limit ?? 100);
+  if (filter.state) q = q.eq("state", filter.state);
+  if (filter.municipality) q = q.eq("municipality", filter.municipality);
+  if (filter.search) q = q.ilike("display_name", `%${filter.search}%`);
+  const { data } = await q;
+  return (data ?? []).map(playerFromRow);
+}
+
+/** Distinct states that have at least one ranked player (for the filter). */
+export async function listRankingStates(): Promise<string[]> {
+  const { data } = await supabase
+    .from("players")
+    .select("state")
+    .not("state", "is", null)
+    .gt("matches_played", 0);
+  const set = new Set<string>();
+  for (const r of data ?? []) if (r.state) set.add(r.state);
+  return [...set].sort();
+}
+
+export async function getPlayer(id: string): Promise<Player | null> {
+  const { data } = await supabase
+    .from("players")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return data ? playerFromRow(data) : null;
+}
+
+/** A player's match history, newest first, with partner names resolved. */
+export async function getPlayerMatches(playerId: string): Promise<PlayerMatch[]> {
+  const { data } = await supabase
+    .from("player_matches")
+    .select("*")
+    .eq("player_id", playerId)
+    .order("played_at", { ascending: false })
+    .limit(200);
+  const rows = data ?? [];
+  // Resolve partner names in one batch.
+  const partnerIds = [...new Set(rows.map((r) => r.partner_id).filter(Boolean))] as string[];
+  const names = new Map<string, string>();
+  if (partnerIds.length) {
+    const { data: partners } = await supabase
+      .from("players")
+      .select("id, display_name")
+      .in("id", partnerIds);
+    for (const p of partners ?? []) names.set(p.id, p.display_name);
+  }
+  return rows.map((r) => ({
+    id: r.id,
+    partnerId: r.partner_id ?? undefined,
+    partnerName: r.partner_id ? names.get(r.partner_id) : undefined,
+    opponent1Id: r.opponent1_id ?? undefined,
+    opponent2Id: r.opponent2_id ?? undefined,
+    tournamentName: r.tournament_name ?? undefined,
+    category: r.category ?? undefined,
+    won: r.won,
+    score: r.score ?? undefined,
+    ratingBefore: Math.round(r.rating_before),
+    ratingAfter: Math.round(r.rating_after),
+    ratingDelta: Math.round(r.rating_delta),
+    playedAt: r.played_at,
+  }));
+}
+
+// ── Friend groups ────────────────────────────────────────────
+
+export async function listFriendGroups(): Promise<FriendGroup[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data } = await supabase
+    .from("friend_groups")
+    .select("*")
+    .eq("owner_id", user.id)
+    .order("created_at", { ascending: false });
+  return (data ?? []).map((g) => ({ id: g.id, name: g.name, slug: g.slug }));
+}
+
+export async function createFriendGroup(
+  name: string,
+): Promise<{ ok: boolean; slug?: string; error?: string }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Inicia sesión." };
+  if (!name.trim()) return { ok: false, error: "Ponle un nombre al grupo." };
+  const slug = slugify(name) + "-" + Math.random().toString(36).slice(2, 6);
+  const { error } = await supabase
+    .from("friend_groups")
+    .insert({ owner_id: user.id, name: name.trim(), slug });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, slug };
+}
+
+export async function getFriendGroupBySlug(
+  slug: string,
+): Promise<{ group: FriendGroup; players: Player[] } | null> {
+  const { data: g } = await supabase
+    .from("friend_groups")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!g) return null;
+  const { data: members } = await supabase
+    .from("friend_group_members")
+    .select("player_id")
+    .eq("group_id", g.id);
+  const ids = (members ?? []).map((m) => m.player_id);
+  let players: Player[] = [];
+  if (ids.length) {
+    const { data } = await supabase
+      .from("players")
+      .select("*")
+      .in("id", ids)
+      .order("rating", { ascending: false });
+    players = (data ?? []).map(playerFromRow);
+  }
+  return { group: { id: g.id, name: g.name, slug: g.slug }, players };
+}
+
+/** Adds a player to a friend group by their player id. */
+export async function addPlayerToGroup(
+  groupId: string,
+  playerId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const { error } = await supabase
+    .from("friend_group_members")
+    .insert({ group_id: groupId, player_id: playerId });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+/** Search players by name (for adding to a friend group). */
+export async function searchPlayers(query: string): Promise<Player[]> {
+  if (!query.trim()) return [];
+  const { data } = await supabase
+    .from("players")
+    .select("*")
+    .ilike("display_name", `%${query}%`)
+    .limit(20);
+  return (data ?? []).map(playerFromRow);
 }

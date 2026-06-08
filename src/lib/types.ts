@@ -161,3 +161,42 @@ export interface Organizer {
   /** 'free' | 'trialing' | 'active' | 'past_due' | 'canceled' | … */
   subscriptionStatus?: string;
 }
+
+// ── Ranking ────────────────────────────────────────────────────
+
+export interface Player {
+  id: string;
+  displayName: string;
+  phone?: string;
+  state?: string;
+  municipality?: string;
+  rating: number;
+  peakRating: number;
+  matchesPlayed: number;
+  wins: number;
+  losses: number;
+  currentStreak: number;
+}
+
+export interface PlayerMatch {
+  id: string;
+  partnerId?: string;
+  partnerName?: string;
+  opponent1Id?: string;
+  opponent2Id?: string;
+  tournamentName?: string;
+  category?: string;
+  won: boolean;
+  score?: string;
+  ratingBefore: number;
+  ratingAfter: number;
+  ratingDelta: number;
+  playedAt: string;
+}
+
+export interface FriendGroup {
+  id: string;
+  name: string;
+  slug: string;
+  memberCount?: number;
+}

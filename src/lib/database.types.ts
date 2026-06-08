@@ -93,6 +93,9 @@ export interface Database {
           categories: Json;
           status: string;
           engine: Json | null;
+          ranked: boolean;
+          state: string | null;
+          municipality: string | null;
           created_at: string;
         };
         Insert: {
@@ -126,6 +129,9 @@ export interface Database {
           categories?: Json;
           status?: string;
           engine?: Json | null;
+          ranked?: boolean;
+          state?: string | null;
+          municipality?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["tournaments"]["Insert"]>;
         Relationships: [];
@@ -246,6 +252,110 @@ export interface Database {
           done?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["jornadas"]["Insert"]>;
+        Relationships: [];
+      };
+      players: {
+        Row: {
+          id: string;
+          display_name: string;
+          normalized_name: string;
+          phone: string | null;
+          state: string | null;
+          municipality: string | null;
+          claimed_by: string | null;
+          rating: number;
+          peak_rating: number;
+          matches_played: number;
+          wins: number;
+          losses: number;
+          current_streak: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          display_name: string;
+          normalized_name: string;
+          phone?: string | null;
+          state?: string | null;
+          municipality?: string | null;
+          claimed_by?: string | null;
+          rating?: number;
+          peak_rating?: number;
+          matches_played?: number;
+          wins?: number;
+          losses?: number;
+          current_streak?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["players"]["Insert"]>;
+        Relationships: [];
+      };
+      player_matches: {
+        Row: {
+          id: string;
+          player_id: string;
+          partner_id: string | null;
+          opponent1_id: string | null;
+          opponent2_id: string | null;
+          tournament_id: string | null;
+          tournament_name: string | null;
+          category: string | null;
+          won: boolean;
+          score: string | null;
+          rating_before: number;
+          rating_after: number;
+          rating_delta: number;
+          played_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          partner_id?: string | null;
+          opponent1_id?: string | null;
+          opponent2_id?: string | null;
+          tournament_id?: string | null;
+          tournament_name?: string | null;
+          category?: string | null;
+          won: boolean;
+          score?: string | null;
+          rating_before: number;
+          rating_after: number;
+          rating_delta: number;
+          played_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["player_matches"]["Insert"]>;
+        Relationships: [];
+      };
+      friend_groups: {
+        Row: {
+          id: string;
+          owner_id: string;
+          name: string;
+          slug: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id: string;
+          name: string;
+          slug: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["friend_groups"]["Insert"]>;
+        Relationships: [];
+      };
+      friend_group_members: {
+        Row: {
+          id: string;
+          group_id: string;
+          player_id: string;
+          added_at: string;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          player_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["friend_group_members"]["Insert"]>;
         Relationships: [];
       };
     };

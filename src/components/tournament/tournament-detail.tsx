@@ -10,10 +10,11 @@ import {
   ConfirmDialog,
   Field,
   Input,
+  Select,
 } from "@/components/ui/primitives";
 import { toast } from "@/components/ui/toast";
 import { useTournament, store } from "@/lib/data/use-store";
-import { FORMAT_LABELS, STATUS_LABELS, isPadel } from "@/lib/utils";
+import { FORMAT_LABELS, STATUS_LABELS, isPadel, MEXICAN_STATES } from "@/lib/utils";
 import type { Tournament } from "@/lib/types";
 import {
   TeamsTab,
@@ -163,6 +164,20 @@ export function TournamentDetail({ id }: { id: string }) {
                   withBusy("terminar", async () => {
                     await store.setStatus(t.id, "done");
                     toast("✅ Torneo terminado");
+                    // Feed results into the global ranking (fire-and-forget).
+                    fetch("/api/rankings/process", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ tournamentId: t.id }),
+                    })
+                      .then((r) => r.json())
+                      .then((d) => {
+                        if (d.processed > 0)
+                          toast(
+                            `🏆 ${d.processed} partidos sumados al ranking`,
+                          );
+                      })
+                      .catch(() => {});
                   })
                 }
               >
@@ -255,6 +270,8 @@ function EditTournamentModal({
     price: tournament.price != null ? String(tournament.price) : "",
     maxPairs: tournament.maxPairs != null ? String(tournament.maxPairs) : "",
     payLink: tournament.payLink ?? "",
+    state: (tournament as { state?: string }).state ?? "",
+    municipality: (tournament as { municipality?: string }).municipality ?? "",
   });
   const [saving, setSaving] = useState(false);
   const setF = (p: Partial<typeof form>) =>
@@ -273,6 +290,8 @@ function EditTournamentModal({
       price: form.price ? Number(form.price) : null,
       maxPairs: form.maxPairs ? Number(form.maxPairs) : null,
       payLink: form.payLink,
+      state: form.state || null,
+      municipality: form.municipality || null,
     });
     setSaving(false);
     if (!r.ok) {
@@ -307,6 +326,26 @@ function EditTournamentModal({
             value={form.date}
             onChange={(e) => setF({ date: e.target.value })}
             placeholder="15 de junio"
+          />
+        </Field>
+        <Field label="Estado (para el ranking)">
+          <Select
+            value={form.state}
+            onChange={(e) => setF({ state: e.target.value })}
+          >
+            <option value="">— Selecciona —</option>
+            {MEXICAN_STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Municipio (opcional)">
+          <Input
+            value={form.municipality}
+            onChange={(e) => setF({ municipality: e.target.value })}
+            placeholder="Guadalajara"
           />
         </Field>
         <Field label="Costo de inscripción (MXN)">

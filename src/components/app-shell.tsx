@@ -91,7 +91,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           {navItem("/dashboard", "📊", "Dashboard", tournaments.length)}
           {navItem("/tournament/new", "➕", "Nuevo Torneo")}
-          {navItem("/contacts", "👥", "Contactos")}
+          {navItem("/ranking", "🏆", "Ranking")}
+          {navItem("/grupos", "👥", "Grupos de amigos")}
+          {navItem("/contacts", "📇", "Contactos")}
 
           {tournaments.length > 0 && (
             <>
